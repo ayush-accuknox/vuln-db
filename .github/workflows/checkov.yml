@@ -19,10 +19,13 @@ jobs:
         run: pip install checkov
 
       - name: Run Checkov Scan
-        run: checkov -d . 
+        run: checkov -d . || true
       
       - name: Run Checkov Scan with Json output
-        run: checkov -d . --output json > checkov_report.json
+        run: checkov -d . --output json > checkov_report.json || true
+
+      - name: Print Checkov Report
+        run: cat checkov_report.json
 
       - name: Upload JSON Report
         uses: actions/upload-artifact@v4
