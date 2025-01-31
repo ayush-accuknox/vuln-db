@@ -1,13 +1,28 @@
-name: Checkov IaC Scan
+name: Checkov IAC Security Scan
+
 on:
-  workflow_dispatch: {}
   push:
     branches:
-    - main
+      - main
+  pull_request:
+
 jobs:
-  Checkov-IAC-Scan:
+  checkov-iac-security_scan:
+    name: Run Checkov
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Checkov Scan
-      uses: bridgecrewio/checkov-action@master
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov Scan
+        run: checkov -d . --output json > checkov_report.json
+
+      - name: Upload JSON Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-results
+          path: checkov_report.json
