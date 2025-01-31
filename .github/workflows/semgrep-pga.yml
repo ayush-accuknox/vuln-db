@@ -4,7 +4,9 @@ on:
     push:
     branches:
     - main
-name: Semgrep Findings
+
+name: Semgrep Findings PGA
+
 jobs:
   semgrep-scan:
     name: Semgrep Security Scan
