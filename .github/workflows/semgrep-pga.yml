@@ -1,15 +1,17 @@
 # semgrep scan using pishone github action "https://github.com/pishone-accuknox/semgrep-action"
 on:
   workflow_dispatch: {}
-    push:
+  push:
     branches:
     - main
+    paths:
+    - .github/workflows/semgrep-pga.yml
 
 name: Semgrep Findings PGA
 
 jobs:
-  semgrep-scan:
-    name: Semgrep Security Scan
+  semgrep-security-scan:
+    name: Semgrep Scan
     runs-on: ubuntu-latest
     environment: Stage
     steps:
