@@ -1,0 +1,12 @@
+rules:
+  - id: python.avoid-equality-operator
+    message: "Avoid using '==' in comparisons. Consider using 'is' for identity checks or use explicit comparison functions if necessary."
+    severity: WARNING
+    languages:
+      - python
+    pattern: |
+      $X == $Y
+    fix: "Consider using 'is' or explicit type comparisons."
+    metadata:
+      category: best_practices
+      technology: python

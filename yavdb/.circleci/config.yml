@@ -1,0 +1,57 @@
+version: 2
+
+jobs:
+  build-lint-test:
+    working_directory: ~/yavdb
+    docker:
+    - image: circleci/ruby:2.5.5
+    steps:
+    - checkout
+
+    - name: Prepare yavdb cache
+      type: shell
+      command: echo "$(date)" > /tmp/yavdb.cache.log
+
+    - name: Restore gem cache
+      type: cache-restore
+      keys:
+      - gem-cache-1-{{ checksum "Gemfile.lock" }}
+
+    - name: Restore yavdb cache
+      type: cache-restore
+      keys:
+      - 2-crawler-yavdb-cache-{{ checksum "/tmp/yavdb.cache.log" }}
+      - 2-crawler-yavdb-cache
+
+    - name: Bundle Install
+      type: shell
+      command: |
+        sudo gem update --system
+        gem install bundler
+        bundle install --path /tmp/vendor/bundle
+
+    - name: Save bundler cache
+      type: cache-save
+      key: gem-cache-1-{{ checksum "Gemfile.lock" }}
+      paths:
+      - /tmp/vendor/bundle
+
+    - name: Rubocop
+      type: shell
+      command: bundle exec rubocop
+
+    - name: Tests
+      type: shell
+      command: bundle exec rake
+
+    - name: Save yavdb cache
+      type: cache-save
+      key: 2-crawler-yavdb-cache-{{ checksum "/tmp/yavdb.cache.log" }}
+      paths:
+      - ~/.yavdb/cache
+
+workflows:
+  version: 2
+  test-and-publish:
+    jobs:
+    - build-lint-test

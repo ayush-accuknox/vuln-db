@@ -1,0 +1,28 @@
+# semgrep scan using pishone github action "https://github.com/pishone-accuknox/semgrep-action"
+on:
+  workflow_dispatch: {}
+name: Semgrep Findings
+jobs:
+  semgrep-scan:
+    name: Semgrep Security Scan
+    runs-on: ubuntu-latest
+    environment: Stage
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run Semgrep Scan
+        uses: pishone-accuknox/semgrep-action@v1.0.3
+        with:
+          endpoint: ${{ secrets.CSPM_URL }}
+          tenant_id: ${{ secrets.TENANT_ID }}
+          label: ${{ vars.LABEL_ID }}
+          token: ${{ secrets.CSPM_TOKEN }}
+          config: 'p/default'
+          extra_args: '--severity ERROR'
+      - name: Upload Scan Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          retention-days: 5
