@@ -19,7 +19,7 @@ jobs:
         run: pip install checkov
 
       - name: Run Checkov Scan
-        run: checkov -d . --output json > checkov_report.json
+        run: checkov -d . 
       
       - name: Run Checkov Scan with Json output
         run: checkov -d . --output json > checkov_report.json
