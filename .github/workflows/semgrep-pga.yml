@@ -1,6 +1,9 @@
 # semgrep scan using pishone github action "https://github.com/pishone-accuknox/semgrep-action"
 on:
   workflow_dispatch: {}
+    push:
+    branches:
+    - main
 name: Semgrep Findings
 jobs:
   semgrep-scan:
