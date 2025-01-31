@@ -1,0 +1,13 @@
+name: Checkov IaC Scan
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+    - main
+jobs:
+  Checkov-IAC-Scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Checkov Scan
+      uses: bridgecrewio/checkov-action@master
