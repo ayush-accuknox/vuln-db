@@ -1,6 +1,5 @@
 # f-> free, P-> Paid
 on:
-on:
   push:
     branches:
       - main
