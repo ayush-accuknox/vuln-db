@@ -38,7 +38,7 @@ jobs:
             source: $source
           }' > /tmp/metadata.json
 
-        # Combine metadata and Semgrep JSON files using jq
+        # Combine metadata and Semgrep JSON files by using jq
         jq -s '.[0] + .[1]' /tmp/metadata.json /tmp/semgrep.json > /tmp/semgrep_output.json
 
     - name: View the output
