@@ -1,11 +1,9 @@
 # f-> free, P-> Paid
 on:
-  workflow_dispatch: {}
+on:
   push:
     branches:
-    - main
-    paths:
-    - .github/workflows/sast.yml
+      - main
 
 name: SAST comparison
 jobs:
@@ -48,7 +46,7 @@ jobs:
         SONAR_HOST_URL: https://sq.accuknox.com
       with:
         args: >
-          -Dsonar.projectKey=pygoat
+          -Dsonar.projectKey=vuln-db
 
   SonarQube-Scan-P:
     name: SonarQube-Scan-Paid
@@ -63,7 +61,7 @@ jobs:
         SONAR_HOST_URL: http://139.59.43.202:9000
       with:
         args: >
-          -Dsonar.projectKey=pygoat
+          -Dsonar.projectKey=vuln-db
 
   Checkmarx-Scan:
     name: Checkmarx-Scan
