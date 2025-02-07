@@ -19,5 +19,5 @@ jobs:
           accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
           tenant_id: ${{ secrets.TENANT_ID }}
           accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
-          label: "my-sast-scan"
-          sonar_project_key: "my-project-key"
+          label: "cicd"
+          sonar_project_key: "vuln-db"
