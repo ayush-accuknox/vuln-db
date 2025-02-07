@@ -24,8 +24,8 @@ jobs:
           --arg ref "${{ github.ref }}" \
           --arg run_id "${{ github.run_id }}" \
           --arg run_number "${{ github.run_number }}" \
-          --arg github_url "${{ github.server_url }}/${{ github.repository }}" \
-          --arg github_run_url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          --arg repo_url "${{ github.server_url }}/${{ github.repository }}" \
+          --arg repo_run_url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
           --arg source "$SOURCE" \
           '{
             repo: $repo,
