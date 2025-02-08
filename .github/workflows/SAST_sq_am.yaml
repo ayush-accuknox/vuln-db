@@ -12,12 +12,12 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run AccuKnox SAST
-        uses: accuknox/accuknox-sast@v1.0.0
+        uses: accuknox/sast-scan-action@v1.0.0
         with:
           sonar_token: ${{ secrets.SONAR_TOKEN }}
           sonar_host_url: ${{ secrets.SONAR_HOST_URL }}
           accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
           tenant_id: ${{ secrets.TENANT_ID }}
           accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
-          label: "my-sast-scan"
-          sonar_project_key: "my-project-key"
+          label: "cicd"
+          sonar_project_key: "vuln-db"

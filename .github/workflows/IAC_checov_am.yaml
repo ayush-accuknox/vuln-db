@@ -29,6 +29,6 @@ jobs:
           # soft_fail:
           # endpoint:
           baseline:
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.CSPM_TOKEN }}
           tenant_id: ${{ secrets.TENANT_ID }}
-          label: ${{ secrets.LABEL }}
+          label: ${{ secrets.LABEL_ID }}
