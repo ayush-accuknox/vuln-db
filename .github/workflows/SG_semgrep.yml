@@ -52,4 +52,4 @@ jobs:
     
     - name: Extract Organization Name
       run: ORG_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f1)
-           echo "Organization Name: ${{ ORG_NAME }}"
+      # echo "Organization Name: ${{ ORG_NAME }}"
