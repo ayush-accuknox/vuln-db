@@ -10,7 +10,7 @@ jobs:
     name: Semgrep-Scan
     runs-on: ubuntu-20.04
     container:
-      image: returntocorp/semgrep:1.106.0
+      image: returntocorp/semgrep:1.103
     steps:
     - uses: actions/checkout@v4
     - run: |
