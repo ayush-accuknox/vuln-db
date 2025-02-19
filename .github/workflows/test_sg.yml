@@ -10,10 +10,13 @@ jobs:
     name: Semgrep-Scan
     runs-on: ubuntu-20.04
     container:
-      image: returntocorp/semgrep:1.103
+      image: returntocorp/semgrep:1.100
+      
     steps:
     - uses: actions/checkout@v4
     - run: |
+        semgrep --version
+
         # Run Semgrep scan and store the output in JSON
         semgrep scan --json --json-output /tmp/semgrep.json
 
