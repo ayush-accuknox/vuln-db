@@ -1,12 +1,16 @@
+# Accuknox Iac Scan using Checkov
+
 name: AccuKnox IaC Scan Workflow
 
 on:
   push:
     branches:
       - main
+      - master
   pull_request:
     branches:
       - main
+      - master
 
 jobs:
   tests:

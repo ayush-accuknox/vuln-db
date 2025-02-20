@@ -1,8 +1,10 @@
+# Sast comparision include - semgrep, sonarqube, checkmarx
 # f-> free, P-> Paid
 on:
   push:
     branches:
       - main
+      - master
 
 name: SAST comparison
 jobs:

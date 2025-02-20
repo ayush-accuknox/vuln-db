@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - main
+      - master
 
 name: Semgrep Findings
 
@@ -14,11 +15,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Run Semgrep Scan
     - run: |
         # Run Semgrep scan and store the output in JSON
         semgrep scan --json --json-output /tmp/semgrep.json
 
+    - name: Capture Repo Metadata
         # Capture GitHub-related variables and store them in a metadata JSON file
+    - run: |
         jq -n \
           --arg repo "${{ github.repository }}" \
           --arg sha "${{ github.sha }}" \
@@ -75,7 +79,7 @@ jobs:
         mv "$TEMP_JSON_FILE" "$JSON_FILE"
 
 
-    - name: View the updated output
+    - name: View the scan output
       run: cat /tmp/semgrep_output.json
 
     - name: Upload updated artifact
@@ -83,6 +87,3 @@ jobs:
       with:
         name: semgrep-report
         path: /tmp/semgrep_output.json
-
-    - name: Extract Organization Name
-      run: echo "ORG_NAME=$(echo '${{ github.repository }}' | cut -d'/' -f1)" >> $GITHUB_ENV

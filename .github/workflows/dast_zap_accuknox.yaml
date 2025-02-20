@@ -1,8 +1,11 @@
+# Accuknox DAST Scan Workflow using ZAP
+
 name: AccuKnox DAST Scan Workflow
 on:
   push:
     branches:
       - main
+      - master
 
 jobs:
   dast-scan:

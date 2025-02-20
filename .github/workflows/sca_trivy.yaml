@@ -1,9 +1,12 @@
+# SCA Scan using Trivy
+
 name: SCA Scan
 
 on:
   push:
     branches:
       - main
+      - master
 
 jobs:
   trivy-sca:

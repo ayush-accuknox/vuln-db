@@ -1,12 +1,16 @@
+# Accuknox aws-cdk scan using checkov
+
 name: CheckOV AWS-CDK Scan
 
 on:
   push:
     branches:
       - main
+      - master
   pull_request:
     branches:
       - main
+      - master
 
 jobs:
   checkOV-aws-cdk-scan:
