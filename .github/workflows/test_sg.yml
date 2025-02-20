@@ -44,34 +44,36 @@ jobs:
       run: |
         JSON_FILE="/tmp/semgrep_output.json"
         TEMP_JSON_FILE="/tmp/semgrep_output_updated.json"
-
+        
         cp "$JSON_FILE" "$TEMP_JSON_FILE"
-
+        
         # Get number of results
         RESULTS_COUNT=$(jq '.results | length' "$JSON_FILE")
-
-        for ((i=0; i<$RESULTS_COUNT; i++)); do
+        
+        # Loop using seq (POSIX-compatible)
+        for i in $(seq 0 $(($RESULTS_COUNT - 1))); do
           FILE_PATH=$(jq -r ".results[$i].path" "$JSON_FILE")
           START_LINE=$(jq -r ".results[$i].start.line" "$JSON_FILE")
           END_LINE=$(jq -r ".results[$i].end.line" "$JSON_FILE")
-
+        
           echo "Processing file: $FILE_PATH (Lines: $START_LINE-$END_LINE)"
-
+        
           if [ -f "$FILE_PATH" ]; then
             # Extract the affected code snippet
             CODE_SNIPPET=$(sed -n "${START_LINE},${END_LINE}p" "$FILE_PATH" | jq -R -s .)
-
+        
             # Update JSON with the extracted code
-            jq --argjson index $i --arg code "$CODE_SNIPPET" \
+            jq --argjson index "$i" --arg code "$CODE_SNIPPET" \
               '(.results[$index].extra.lines) = $code' \
               "$TEMP_JSON_FILE" > temp.json && mv temp.json "$TEMP_JSON_FILE"
           else
             echo "Warning: File $FILE_PATH not found!"
           fi
         done
-
+        
         # Replace original JSON with the updated one
         mv "$TEMP_JSON_FILE" "$JSON_FILE"
+
 
     - name: View the updated output
       run: cat /tmp/semgrep_output.json
