@@ -59,8 +59,8 @@ jobs:
           echo "Processing file: $FILE_PATH (Lines: $START_LINE-$END_LINE)"
         
           if [ -f "$FILE_PATH" ]; then
-            # Extract the affected code snippet and clean newlines
-            CODE_SNIPPET=$(sed -n "${START_LINE},${END_LINE}p" "$FILE_PATH" | jq -R -s @json | sed 's/^"//;s/"$//')
+            # Extract affected code snippet with minimal escaping
+            CODE_SNIPPET=$(sed -n "${START_LINE},${END_LINE}p" "$FILE_PATH" | jq -R -s @json | jq -r .)
         
             # Update JSON with the extracted code
             jq --argjson index "$i" --arg code "$CODE_SNIPPET" \
