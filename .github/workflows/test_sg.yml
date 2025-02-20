@@ -1,58 +1,34 @@
+name: Semgrep Findings
+
 on:
   push:
     branches:
       - main
-
-name: Semgrep Findings
 
 jobs:
   semgrep-scan:
     name: Semgrep-Scan
     runs-on: ubuntu-20.04
     container:
-      image: returntocorp/semgrep:1.100
-      
+      image: returntocorp/semgrep
+
     steps:
-    - uses: actions/checkout@v4
-    - run: |
-        semgrep --version
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-        # Run Semgrep scan and store the output in JSON
-        semgrep scan --json --json-output /tmp/semgrep.json
+      - name: Authenticate with Semgrep (if using Pro/Enterprise)
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_API_KEY }}
+        run: echo "Authenticated with Semgrep Pro"
 
-        # Capture GitHub-related variables and store them in a metadata JSON file
-        jq -n \
-          --arg repo "${{ github.repository }}" \
-          --arg sha "${{ github.sha }}" \
-          --arg ref "${{ github.ref }}" \
-          --arg run_id "${{ github.run_id }}" \
-          --arg run_number "${{ github.run_number }}" \
-          --arg repo_url "${{ github.server_url }}/${{ github.repository }}" \
-          --arg repo_run_url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-          --arg source "$SOURCE" \
-          '{
-            repo: $repo,
-            sha: $sha,
-            ref: $ref,
-            run_id: $run_id,
-            run_number: $run_number,
-            repo_url: $repo_url,
-            repo_run_url: $repo_run_url,
-            source: $source
-          }' > /tmp/metadata.json
+      - name: Run Semgrep Scan
+        run: |
+          semgrep scan --json --json-output /tmp/semgrep.json
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_API_KEY }}  # Ensures API key is used during scan
 
-        # Combine metadata and Semgrep JSON files by using jq
-        jq -s '.[0] + .[1]' /tmp/metadata.json /tmp/semgrep.json > /tmp/semgrep_output.json
-
-    - name: View the output
-      run: cat /tmp/semgrep_output.json
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: semgrep-report
-        path: /tmp/semgrep_output.json
-    
-    - name: Extract Organization Name
-      run: ORG_NAME=$(echo "${{ github.repository }}" | cut -d'/' -f1)
-      # echo "Organization Name: ${{ ORG_NAME }}"
+      - name: Upload Semgrep Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: /tmp/semgrep.json
