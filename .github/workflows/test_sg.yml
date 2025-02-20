@@ -1,9 +1,9 @@
-name: Semgrep Findings
-
 on:
   push:
     branches:
       - main
+
+name: Semgrep Findings
 
 jobs:
   semgrep-scan:
@@ -11,24 +11,76 @@ jobs:
     runs-on: ubuntu-20.04
     container:
       image: returntocorp/semgrep
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Authenticate with Semgrep (if using Pro/Enterprise)
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_API_KEY }}
-        run: echo "Authenticated with Semgrep Pro"
+    - run: |
+        # Run Semgrep scan and store the output in JSON
+        semgrep scan --json --json-output /tmp/semgrep.json
 
-      - name: Run Semgrep Scan
-        run: |
-          semgrep scan --json --json-output /tmp/semgrep.json
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_API_KEY }}  # Ensures API key is used during scan
+        # Capture GitHub-related variables and store them in a metadata JSON file
+        jq -n \
+          --arg repo "${{ github.repository }}" \
+          --arg sha "${{ github.sha }}" \
+          --arg ref "${{ github.ref }}" \
+          --arg run_id "${{ github.run_id }}" \
+          --arg run_number "${{ github.run_number }}" \
+          --arg repo_url "${{ github.server_url }}/${{ github.repository }}" \
+          --arg repo_run_url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          '{
+            repo: $repo,
+            sha: $sha,
+            ref: $ref,
+            run_id: $run_id,
+            run_number: $run_number,
+            repo_url: $repo_url,
+            repo_run_url: $repo_run_url
+          }' > /tmp/metadata.json
 
-      - name: Upload Semgrep Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: semgrep-report
-          path: /tmp/semgrep.json
+        # Combine metadata and Semgrep JSON files
+        jq -s '.[0] + .[1]' /tmp/metadata.json /tmp/semgrep.json > /tmp/semgrep_output.json
+
+    - name: Extract Affected Code Snippets
+      run: |
+        JSON_FILE="/tmp/semgrep_output.json"
+        TEMP_JSON_FILE="/tmp/semgrep_output_updated.json"
+
+        cp "$JSON_FILE" "$TEMP_JSON_FILE"
+
+        # Get number of results
+        RESULTS_COUNT=$(jq '.results | length' "$JSON_FILE")
+
+        for ((i=0; i<$RESULTS_COUNT; i++)); do
+          FILE_PATH=$(jq -r ".results[$i].path" "$JSON_FILE")
+          START_LINE=$(jq -r ".results[$i].start.line" "$JSON_FILE")
+          END_LINE=$(jq -r ".results[$i].end.line" "$JSON_FILE")
+
+          echo "Processing file: $FILE_PATH (Lines: $START_LINE-$END_LINE)"
+
+          if [ -f "$FILE_PATH" ]; then
+            # Extract the affected code snippet
+            CODE_SNIPPET=$(sed -n "${START_LINE},${END_LINE}p" "$FILE_PATH" | jq -R -s .)
+
+            # Update JSON with the extracted code
+            jq --argjson index $i --arg code "$CODE_SNIPPET" \
+              '(.results[$index].extra.lines) = $code' \
+              "$TEMP_JSON_FILE" > temp.json && mv temp.json "$TEMP_JSON_FILE"
+          else
+            echo "Warning: File $FILE_PATH not found!"
+          fi
+        done
+
+        # Replace original JSON with the updated one
+        mv "$TEMP_JSON_FILE" "$JSON_FILE"
+
+    - name: View the updated output
+      run: cat /tmp/semgrep_output.json
+
+    - name: Upload updated artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: semgrep-report
+        path: /tmp/semgrep_output.json
+
+    - name: Extract Organization Name
+      run: echo "ORG_NAME=$(echo '${{ github.repository }}' | cut -d'/' -f1)" >> $GITHUB_ENV
